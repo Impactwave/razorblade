@@ -1,0 +1,23 @@
+{
+  "name": "impactwave/razorblade",
+  "description": "An extension to Laravel's Blade templating engine",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Claudio Silva",
+      "email": "claudio.silva@impactwave.com"
+    },
+    {
+      "name": "Impactwave",
+      "email": "impactwave@impactwave.com",
+      "homepage": "http://impactwave.com"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "psr-4": {
+      "Impactwave\\Razorblade\\": "src"
+    }
+  }
+}
