@@ -46,7 +46,7 @@ Implementing the method itself to perform some useful work is also quite simple.
 > Razorblade provides you with some predefined macros on the `Impactwave\Razorblade\Macros` class.
 > See the documentation for them further below.
 
-#### Simple Macros
+### Simple Macros
 
 The simplest kind of macro allows you to invoke a method and replace the macro call with the output from it.  
 The method can, optionally, receive one or more arguments from the template.
@@ -77,7 +77,7 @@ static public macroName ($arg1, ...) {}
 * The method has no return value. The output it generates should be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
 
-#### Block Macros
+### Block Macros
 
 A macro, besides (optionally) having regular function-like
 arguments, can also process a full block of markup, like some of the predefined Blade constructs do (like, for instance,
@@ -114,7 +114,7 @@ static public macroName ($indentSpace, $html, $arg1, ...) {}
 * The method has no return value. The output it generates should be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
 
-#### Boolean attribute generation
+### Boolean attribute generation
 
 A shorter and more readable syntax for generating boolean html attributes.
 
@@ -130,10 +130,10 @@ It outputs a valueless attribute if the argument is true, otherwise it suppresse
 
 ##### Generated code
 
-    {{ Macros::boolAttr (precedentSpace,attrName,expression) }}
+    {{ Macro::boolAttr (precedentSpace,attrName,expression) }}
 
 * Parenthesis are optional; ex: `@attr a::b` instead of `@attr a::b()`
-* `Macros` is `Impactwave\Razorblade\Macros`
+* `Macro` is `Impactwave\Razorblade\Macro`
 
 ## Predefined Macros
 
@@ -276,7 +276,7 @@ Generates a Bootstrap-compatible alert box that displays an alert title and text
 
     @@validationErrors (type = 'warning')
 
-* `type`: The error type; a standard Bootstrap alert class. Defaults to 'warning'.
+* `type`: The error type: `error|info|success|warning`. Defaults to `warning`.
 
 ##### Requirements
 
@@ -301,7 +301,7 @@ Displays a flash message that was set on the previous request.
 
 A flash message is stored on the `Session`'s `message` key with the format: `'type|message|title'`.
 
-* `type`: a standard Bootstrap alert class; ex: `'warning'`.
+* `type`: The error type: `error|info|success|warning`. Defaults to `warning`.
 * `message`: the message.
 * `type`: an optional title.
 
@@ -319,6 +319,90 @@ Displays a popup flash message using the Toastr javascript plugin.
 
 See `@@flashMessage` for more information.
 
+## The `Form` utility class
+
+The `Impactwave\Razorblade\Form` class provides several static utility methods that are best used in conjunction with the predefined Razorblade macros.
+
+### Form::flash
+
+Allows sending flash messages to be viewed on the next request.
+It has support for 4 types of messages and allows setting an optional title.
+
+> **Hint:** use the `@@flashMessage` or `@@toastrMessage` macros for displaying the message.
+
+##### Syntax
+
+```php
+flash ($message, $title = '', $type = Form::ALERT_WARNING)
+```
+
+* `string $message`: The message to be displayed.
+* `string $title`: An optional title for the alert box.
+* `string $type`: The alert type: `error|info|success|warning`. You can also use one of the `Form::ALERT_xxx` constants.
+
+### Form::fieldIs
+
+Checks if the field's currently submitted value matches the given value.
+
+If the field's value is an array (being the field name suffixed by `[]`), this will match the reference value against all array values (for instance, in the case of multiple radio buttons for the same field, or for a multi-select dropdown).
+
+##### Syntax
+
+```php
+Form::fieldIs ($field, $value)
+```
+
+* `string $field`: Field name.
+* `string $value`: Field value to match.
+
+### Form::fieldWas
+
+Checks if the field's previously submitted value matches the given value.
+
+If the field's value was an array (being the field name suffixed by `[]`), this will match the reference value against all array values (for instance, in the case of multiple radio buttons for the same field, or for a multi-select dropdown).
+
+##### Syntax
+
+```php
+Form::fieldWas ($field, $value)
+```
+
+* `string $field`: Field name.
+* `string $value`: Field value to match.
+
+### Form::validate
+
+Shortcut method for form data validation.
+
+If validates the form input and, if it fails:
+
+- flashes an error message;
+- generates a redirection to the same URL;
+- saves on the session the validation error messages and the submitted form values, so that they can be
+  redisplayed on the next request.
+
+> **Hint:** use this in conjunction with `@@field` macros to easily create a form with validation.
+
+##### Usage
+
+Place the `validate` call on the controller method that handles the POST request.
+
+```php
+$err = Util::validate([
+  'password'  => 'required|min:8',
+  'password2' => 'required|same:password',
+  etc...
+]);
+if ($err) return $err;
+// continue handling the form
+```
+
+* `array $rules`: A map of field names to validation rules.
+* `array $messages`: [optional] Custom error messages. See the Laravel documentation for the `Validator` class.
+* `array $customAttributes`: [optional] Custom attributes. See the Laravel documentation for the `Validator` class.
+* Returns: `false|\Illuminate\Http\RedirectResponse` - `false` if the form validates successfully, otherwise, a redirection response.
+
+---
 
 ## License
 

@@ -102,6 +102,19 @@ HTML;
   }
 
   /**
+   * Generated the form field's group CSS class.
+   *
+   * <p>It outputs `form-group`, with an additional `has-error` CSS class if the field failed validation.
+   *
+   * @param string $field Field name.
+   */
+  static function groupClass ($field)
+  {
+    $errors = View::shared ('errors');
+    echo 'form-group' . ($errors->has ($field) ? ' has-error' : ' ');
+  }
+
+  /**
    * Includes public files.
    *
    * <p>Unlinke Blade's &#x40;`include`, which includes templates from the `view` directory, this directive includes a
@@ -163,7 +176,7 @@ HTML;
    * Generates a Bootstrap-compatible alert box that displays an alert title and text, followed by all error messages
    * that resulted from the last form validation.
    *
-   * @param string $type [optional] The error type; a standard Bootstrap alert class. Defaults to 'warning'.
+   * @param string $type [optional] The error type: `error|info|success|warning`. Defaults to `warning`.
    */
   static function validationErrors ($type = 'warning')
   {
@@ -178,12 +191,6 @@ HTML;
       </div>
       <?php
     endif;
-  }
-
-  private static function groupClass ($field)
-  {
-    $errors = View::shared ('errors');
-    return 'form-group' . ($errors->has ($field) ? ' has-error' : ' ');
   }
 
   /**

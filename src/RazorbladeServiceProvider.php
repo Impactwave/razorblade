@@ -31,7 +31,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      *
      * Generated code:
      *
-     *   {{ Macros::boolAttr (precedentSpace,attrName,expression) }}
+     *   {{ Macro::boolAttr (precedentSpace,attrName,expression) }}
      *
      * Parenthesis are optional; ex: @attr a::b instead of @attr a::b()
      * precedentSpace is the white space preceding the attribute. If the attribute is not output,
@@ -43,7 +43,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           list ($all, $space, $attr, $quote, $args) = $match;
           if ($args != '')
             $args = ",$args";
-          $Form = Macros::class;
+          $Form = Macro::class;
           return "<?php echo $Form::boolAttr('$space','$attr'$args) ?>";
         }, $view);
     });
@@ -73,7 +73,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           if ($close)
             throw new \RuntimeException ("Missing colon after macro block start @@$fullName($args)");
           if ($class == '')
-            $class = Macros::class;
+            $class = Macro::class;
           return "$space<?php echo $class::$method($args) ?>";
         }, $view);
     });
@@ -104,7 +104,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           if ($close == '@')
             throw new \RuntimeException ("Ill-formed close tag for macro @@$fullName($args)");
           if ($class == '')
-            $class = Macros::class;
+            $class = Macro::class;
           if ($args != '')
             $args = ",$args";
           return "$space<?php ob_start() ?>$content<?php echo $class::$method('$indentSpace',ob_get_clean()$args) ?>";
