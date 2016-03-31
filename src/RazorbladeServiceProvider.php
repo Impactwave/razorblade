@@ -1,26 +1,16 @@
 <?php
 namespace Impactwave\Razorblade;
+
+use Blade;
 use Illuminate\Support\ServiceProvider;
-use \Blade;
 
 class RazorbladeServiceProvider extends ServiceProvider
 {
   /**
    * Bootstrap any application services.
    */
-  public function boot()
+  public function boot ()
   {
-    /*
-     * Short syntax for including a file from the public directory.
-     *
-     *   Syntax: @includePublic ('relative/path/to/file.html')
-     */
-    Blade::extend (function ($view) {
-      return preg_replace ('/(?<!\w)(\s*)@includePublic\s*\((.*)\)/',
-        '$1<?php include public_path($2) ?>', $view);
-    });
-
-
     /*
      * Boolean attribute generation
      *
@@ -40,11 +30,8 @@ class RazorbladeServiceProvider extends ServiceProvider
     Blade::extend (function ($view) {
       return preg_replace_callback ('/(?<!\w)(\s*)([\w\\\]+)\s*=\s*(["\'])\s*@boolAttr\s*(?:\((.*?)\))?\s*\3/s',
         function ($match) {
-          list ($all, $space, $attr, $quote, $args) = $match;
-          if ($args != '')
-            $args = ",$args";
-          $Form = Macro::class;
-          return "<?php echo $Form::boolAttr('$space','$attr'$args) ?>";
+          list ($all, $space, $attr, $quote, $bool) = $match;
+          return "<?php echo $bool ? '$space$attr' : '' ?>";
         }, $view);
     });
 
