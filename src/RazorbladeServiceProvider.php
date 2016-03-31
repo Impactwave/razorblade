@@ -13,10 +13,10 @@ class RazorbladeServiceProvider extends ServiceProvider
     /*
      * Short syntax for including a file from the public directory.
      *
-     *   Syntax: @includeStatic ('relative/path/to/file.html')
+     *   Syntax: @includePublic ('relative/path/to/file.html')
      */
     Blade::extend (function ($view) {
-      return preg_replace ('/(?<!\w)(\s*)@includeStatic\s*\((.*)\)/',
+      return preg_replace ('/(?<!\w)(\s*)@includePublic\s*\((.*)\)/',
         '$1<?php include public_path($2) ?>', $view);
     });
 
@@ -31,7 +31,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      *
      * Generated code:
      *
-     *   {{ Form::boolAttr (precedentSpace,attrName,expression) }}
+     *   {{ Macros::boolAttr (precedentSpace,attrName,expression) }}
      *
      * Parenthesis are optional; ex: @attr a::b instead of @attr a::b()
      * precedentSpace is the white space preceding the attribute. If the attribute is not output,
@@ -43,7 +43,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           list ($all, $space, $attr, $quote, $args) = $match;
           if ($args != '')
             $args = ",$args";
-          $Form = Form::class;
+          $Form = Macros::class;
           return "<?php echo $Form::boolAttr('$space','$attr'$args) ?>";
         }, $view);
     });
@@ -73,7 +73,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           if ($close)
             throw new \RuntimeException ("Missing colon after macro block start @@$fullName($args)");
           if ($class == '')
-            $class = Form::class;
+            $class = Macros::class;
           return "$space<?php echo $class::$method($args) ?>";
         }, $view);
     });
@@ -104,7 +104,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           if ($close == '@')
             throw new \RuntimeException ("Ill-formed close tag for macro @@$fullName($args)");
           if ($class == '')
-            $class = Form::class;
+            $class = Macros::class;
           if ($args != '')
             $args = ",$args";
           return "$space<?php ob_start() ?>$content<?php echo $class::$method('$indentSpace',ob_get_clean()$args) ?>";
@@ -112,5 +112,15 @@ class RazorbladeServiceProvider extends ServiceProvider
     });
 
 
+  }
+
+  /**
+   * Register the service provider.
+   *
+   * @return void
+   */
+  public function register ()
+  {
+    // Not used
   }
 }
