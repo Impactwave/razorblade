@@ -410,4 +410,4 @@ The MIT license. See the accompanying `LICENSE` file.
 
 --------------------------------------------------------------------------------
 
-Copyright © 2016 Cláudio Silva and Impactwave, Lda.
+Copyright © 2016 [Cláudio Silva](https://github.com/claudio-silva) and [Impactwave, Lda](https://github.com/impactwave)
