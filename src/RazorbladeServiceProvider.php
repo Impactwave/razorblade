@@ -50,15 +50,10 @@ class RazorbladeServiceProvider extends ServiceProvider
      * If class is not specified, Form is assumed.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)@@((?:([\w\\\\]+)::)?(\w+))\s*(?:\((.*?)\))?\s*(:)?\s*$(.*?@@?end\2)?/ms',
+      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(\s*\([^\)]*\)+)?(?!\s*(?::|\)|\())/ms',
         function ($match) {
-          $match[] = ''; // allow $args. $colon and $close to be undefined.
-          $match[] = '';
-          $match[] = '';
-          list ($all, $space, $fullName, $class, $method, $args, $colon, $close) = $match;
-          if ($colon) return $all; // Skip macro blocks.
-          if ($close)
-            throw new \RuntimeException ("Missing colon after macro block start @@$fullName($args)");
+          $match[] = ''; // allow $args to be undefined.
+          list ($all, $space, $fullName, $class, $method, $args) = $match;
           if ($class == '')
             $class = Macro::class;
           return "$space<?php echo $class::$method($args) ?>";
@@ -85,7 +80,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      * indentSpace is a white space string corresponding to the indentation level of this block.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)^([ \t]*)@@((?:([\w\\\]+)::)?(\w+))\s*(?:\((.*?)\))?\s*:\s*(.*?)(@@?)end\3/sm',
+      return preg_replace_callback ('/(?<!\w)(\s*)^([ \t]*)@@((?:([\w\\\]+)::)?(\w+))(?:\s*\((.*?)\))?:\s*(.*?)(@@?)end\3\b/sm',
         function ($match) {
           list ($all, $space, $indentSpace, $fullName, $class, $method, $args, $content, $close) = $match;
           if ($close == '@')
@@ -94,6 +89,7 @@ class RazorbladeServiceProvider extends ServiceProvider
             $class = Macro::class;
           if ($args != '')
             $args = ",$args";
+          $content = Blade::compileString($content);
           return "$space<?php ob_start() ?>$content<?php echo $class::$method('$indentSpace',ob_get_clean()$args) ?>";
         }, $view);
     });

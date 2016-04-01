@@ -70,7 +70,7 @@ The method can, optionally, receive one or more arguments from the template.
 The method implementing the macro should have the following signature:
 
 ```php
-static public macroName ($arg1, ...) {}
+static public function macroName ($arg1, ...) {}
 ```
 
 * `$arg1, ...` denotes a list of optional arguments. It may be completely ommited.
@@ -105,7 +105,7 @@ the `@if (...args) ...markup... @endif` construct does).
 The method implementing the macro should have the following signature:
 
 ```php
-static public macroName ($indentSpace, $html, $arg1, ...) {}
+static public function macroName ($indentSpace, $html, $arg1, ...) {}
 ```
 
 * `$arg1, ...` denotes a list of optional arguments. It may be completely ommited.
