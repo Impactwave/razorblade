@@ -182,7 +182,7 @@ HTML;
   {
     $errors = View::shared ('errors');
     if (count ($errors)): ?>
-      <div class="alert alert-<?= $type ?>">
+      <div class="alert alert-<?= $type ?> alert-validation">
         <h4><?= Lang::get ('auth.PROBLEMS 1') ?></h4><?= Lang::get ('auth.PROBLEMS') ?><br><br>
         <ul>
           <?php foreach ($errors->all () as $error)

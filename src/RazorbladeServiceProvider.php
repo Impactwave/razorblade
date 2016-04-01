@@ -52,9 +52,9 @@ class RazorbladeServiceProvider extends ServiceProvider
     Blade::extend (function ($view) {
       return preg_replace_callback ('/(?<!\w)(\s*)@@((?:([\w\\\\]+)::)?(\w+))\s*(?:\((.*?)\))?\s*(:)?\s*$(.*?@@?end\2)?/ms',
         function ($match) {
-          array_push ($match, 0); // allow $args. $colon and $close to be undefined.
-          array_push ($match, 0);
-          array_push ($match, 0);
+          $match[] = ''; // allow $args. $colon and $close to be undefined.
+          $match[] = '';
+          $match[] = '';
           list ($all, $space, $fullName, $class, $method, $args, $colon, $close) = $match;
           if ($colon) return $all; // Skip macro blocks.
           if ($close)
