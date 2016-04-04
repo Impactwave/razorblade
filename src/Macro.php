@@ -9,6 +9,8 @@ use View;
 
 class Macro
 {
+  private static $fieldDefaulOptions = [];
+
   /**
    * @param string $id
    * @param string $path
@@ -38,7 +40,7 @@ class Macro
    *
    * <p>If label argument is ommited, no label will be generated. If it's empty, an empty label will be output.
    * For array fields (ex: select multiple), append [] to the field name.
-   * The options array may specify:
+   * The options array is merged with the default options ({@see fieldDefaulOptions}), and it may specify:
    *  - id: if this is ommited, an id="input-fieldName" attribute is generated. If it's empty, no id attribute will be
    *  output.
    *  - related: the field name of a related field (ex. password confirmation field) for field name translation.
@@ -49,19 +51,23 @@ class Macro
    *  - lblClass: classe(s) a aplicar na label do(s) input(s). Por omissão: 'control-label'.
    *  - outerId: id a aplicar ao div exterior.
    *  - innerId: id a aplicar ao div interior.
+   *  - model: field name path prefix, for retrieving values from nested arrays (ex: 'authe.user.name')
    */
   static function field ($space, $html, $name, $label = null, $options = [])
   {
+    $options = $options + self::$fieldDefaulOptions;
     // Remove [] suffix, if present.
     $field    = substr ($name, -1) == ']' ? substr ($name, 0, strlen ($name) - 2) : $name;
+    $model    = array_get ($options, 'model', '');
+    if ($model) $field = "$model.$field";
     $id       = array_get ($options, 'id', "input-$field");
     $forId    = $id ? " for=\"$id\"" : '';
     $idAttr   = $id ? " id=\"$id\"" : '';
     $errors   = View::shared ('errors');
     $outClass = array_get ($options, 'outerClass', 'form-group') . ($errors->has ($field) ? ' has-error' : ' ');
-    $message  = self::validationMessageFor ($field, $label, get ($options, 'related'), get ($options, 'relatedLabel'));
+    $message  = self::validationMessageFor ($field, $label, array_get ($options, 'related'), array_get ($options, 'relatedLabel'));
     $lblClass = array_get ($options, 'lblClass', 'control-label');
-    $label    = isset($label) && !get ($options, 'noLabel') ? "<label$forId class=\"$lblClass\">$label</label>" : '';
+    $label    = isset($label) && !array_get ($options, 'noLabel') ? "<label$forId class=\"$lblClass\">$label</label>" : '';
     $old      = Input::old ($field);
     $value    = is_array ($old) || is_null ($old) ? '' : $old;
     $html     = Str::contains ($html, '<textarea')
@@ -82,6 +88,11 @@ $space  <div class="$innClass"$innId>
 $space    $html$message$space</div>
 $space</div>
 HTML;
+  }
+
+  static function fieldDefaultOptions ($options = [])
+  {
+    self::$fieldDefaulOptions = $options;
   }
 
   /**
@@ -142,8 +153,10 @@ HTML;
    * Displays a popup flash message using the Toastr javascript plugin.
    *
    * @see flashMessage()
+   * @param int $timeout
+   * @return string
    */
-  static function toastrMessage ()
+  static function toastrMessage ($timeout = 5000)
   {
     if (Session::has ('message')) {
       list ($flashType, $msg, $title) = explode ('|', Session::get ('message')) + [''] + [''];
@@ -153,6 +166,7 @@ HTML;
 <script>
   setTimeout(function () {
     toastr.options = {
+      timeOut:       $timeout,
       closeButton:   false,
       positionClass: 'toast-top-full-width'
     };

@@ -274,9 +274,9 @@ Generates a Bootstrap-compatible alert box that displays an alert title and text
 
 ##### Syntax
 
-    @@validationErrors (type = 'warning')
+    @@validationErrors (type = 'info')
 
-* `type`: The error type: `error|info|success|warning`. Defaults to `warning`.
+* `type`: The error type: `error|info|success|warning`. Defaults to `info`.
 
 ##### Requirements
 
@@ -333,7 +333,7 @@ It has support for 4 types of messages and allows setting an optional title.
 ##### Syntax
 
 ```php
-flash ($message, $title = '', $type = Form::ALERT_WARNING)
+flash ($message, $title = '', $type = Form::ALERT_INFO)
 ```
 
 * `string $message`: The message to be displayed.
@@ -370,6 +370,20 @@ Form::fieldWas ($field, $value)
 * `string $field`: Field name.
 * `string $value`: Field value to match.
 
+### Form::setModel
+
+Sets the data to be initially displayed on a form, before the form is submitted for the first time.
+
+Use this in conjunction with the `@@field` macros and `Form::validate()`.
+
+##### Syntax
+
+```php
+Form::setModel ($model)
+```
+
+* `array $model`: The form data, as a map of field names to field values.
+
 ### Form::validate
 
 Shortcut method for form data validation.
@@ -401,6 +415,14 @@ if ($err) return $err;
 * `array $messages`: [optional] Custom error messages. See the Laravel documentation for the `Validator` class.
 * `array $customAttributes`: [optional] Custom attributes. See the Laravel documentation for the `Validator` class.
 * Returns: `false|\Illuminate\Http\RedirectResponse` - `false` if the form validates successfully, otherwise, a redirection response.
+
+##### Requirements
+
+You must define the following localization keys:
+
+Key                       | Meaning
+--------------------------|------------------------
+`app.formValidationFailed`| A generic message explaining that the form could not be submitted. Details can be found next to each invalid field.
 
 ---
 

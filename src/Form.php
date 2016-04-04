@@ -69,13 +69,26 @@ class Form
    *
    * @param string $message The message to be displayed.
    * @param string $title   An optional title for the alert box.
-   * @param string $type    The error type: `error|info|success|warning`. Defaults to `warning`.
+   * @param string $type    The error type: `error|info|success|warning`. Defaults to `info`.
    *
    * @return \Illuminate\Routing\Redirector
    */
-  public static function flash ($message, $title = '', $type = self::ALERT_WARNING)
+  public static function flash ($message, $title = '', $type = self::ALERT_INFO)
   {
     Session::flash ('message', "$type|$message|$title");
+  }
+
+  /**
+   * Sets the data to be initially displayed on a form, before the form is submitted for the first time.
+   *
+   * <p>Use this in conjunction with the `field` macros and {@see Form::validate()}.
+   *
+   * @param array $model The form data, as a map of field names to field values.
+   */
+  static function setModel (array $model)
+  {
+    if (is_null (Input::old ('_token')))
+      Session::flashInput ($model);
   }
 
   /**
@@ -116,7 +129,7 @@ class Form
   {
     $validator = Validator::make (Input::all (), $rules, $messages, $customAttributes);
     if ($validator->fails ()) {
-      self::flash (Lang::get ('app.form_validation_failed'));
+      self::flash (Lang::get ('app.formValidationFailed'), '', self::ALERT_ERROR);
       return Redirect::refresh ()
                      ->withErrors ($validator)
                      ->withInput ();

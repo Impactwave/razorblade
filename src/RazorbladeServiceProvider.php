@@ -50,13 +50,13 @@ class RazorbladeServiceProvider extends ServiceProvider
      * If class is not specified, Form is assumed.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(\s*\([^\)]*\)+)?(?!\s*(?::|\)|\())/ms',
+      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(\s*\((?:(?!\)[\s:]).)*\))?(.)/ms',
         function ($match) {
-          $match[] = ''; // allow $args to be undefined.
-          list ($all, $space, $fullName, $class, $method, $args) = $match;
+          list ($all, $space, $fullName, $class, $method, $args, $nextCh) = $match;
+          if ($nextCh == ':') return $all;
           if ($class == '')
             $class = Macro::class;
-          return "$space<?php echo $class::$method($args) ?>";
+          return "$space<?php echo $class::$method($args) ?>$nextCh";
         }, $view);
     });
 
@@ -80,7 +80,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      * indentSpace is a white space string corresponding to the indentation level of this block.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)^([ \t]*)@@((?:([\w\\\]+)::)?(\w+))(?:\s*\((.*?)\))?:\s*(.*?)(@@?)end\3\b/sm',
+      return preg_replace_callback ('/(?<!\w)(\s*)^([ \t]*)@@((?:([\w\\\]+)::)?(\w+))(?:\s*\(((?:(?!\)\s).)*?)\))?:\s*(.*?)(@@?)end\3\b/sm',
         function ($match) {
           list ($all, $space, $indentSpace, $fullName, $class, $method, $args, $content, $close) = $match;
           if ($close == '@')
@@ -89,7 +89,7 @@ class RazorbladeServiceProvider extends ServiceProvider
             $class = Macro::class;
           if ($args != '')
             $args = ",$args";
-          $content = Blade::compileString($content);
+          $content = Blade::compileString ($content);
           return "$space<?php ob_start() ?>$content<?php echo $class::$method('$indentSpace',ob_get_clean()$args) ?>";
         }, $view);
     });
