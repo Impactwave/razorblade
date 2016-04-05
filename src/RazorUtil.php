@@ -7,7 +7,10 @@ use Lang;
 use Session;
 use View;
 
-class Macro
+/**
+ * Razorblade's set of predefined custom directives.
+ */
+class RazorUtil
 {
   private static $fieldDefaulOptions = [
     'id'           => '',

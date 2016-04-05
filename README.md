@@ -26,9 +26,9 @@ Add the following string to that array:
 
 ## Blade Extensions
 
-Besides providing some **new Blade directives** (see below), *Razorblade* also adds **macros** to Blade.
+Besides providing some **new Blade directives** (see below), *Razorblade* also adds **Custom Directives** to Blade.
 
-##### What are Macros?
+##### What are Custom Directives?
 
 Creating a Blade syntax extension is not too difficult, but it's not very easy either.
 You'll have to deal with regular expressions and low-level implementation details.
@@ -37,18 +37,18 @@ In practice, few people have the skills and patience to do it, so extensions are
 What if you could easily create your own syntactic extensions to Blade and make your templates more readable and easier
 to write?
 
-*Razorblade* provides you with a simple and easy way to do it, called **macros**.
+*Razorblade* provides you with a simple and easy way to do it, called **Custom Directives**.
   
 You just create a simple static method on a class of your choosing, with a specific call signature,
 and you can immediately call it from Blade.  
 Implementing the method itself to perform some useful work is also quite simple.
 
-> Razorblade provides you with some predefined macros on the `Impactwave\Razorblade\Macros` class.
+> Razorblade provides you with some predefined custom directives on the `Impactwave\Razorblade\Macros` class.
 > See the documentation for them further below.
 
-### Simple Macros
+### Simple Custom Directives
 
-The simplest kind of macro allows you to invoke a method and replace the macro call with the output from it.  
+The simplest kind of custom directive allows you to invoke a method and replace the custom directive call with the output from it.  
 The method can, optionally, receive one or more arguments from the template.
 
 ##### Syntax
@@ -65,9 +65,9 @@ The method can, optionally, receive one or more arguments from the template.
 * `class` is a fully qualified class name; ex: `my\namespace\myClass` or just `myClass`.  
 * If class is not specified, `Impactwave\Razorblade\Macros` is assumed.
 
-##### Macro implementation
+##### Custom Directive implementation
 
-The method implementing the macro should have the following signature:
+The method implementing the custom directive should have the following signature:
 
 ```php
 static public function macroName ($arg1, ...) {}
@@ -77,9 +77,9 @@ static public function macroName ($arg1, ...) {}
 * The method has no return value. The output it generates should be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
 
-### Block Macros
+### Block Custom Directives
 
-A macro, besides (optionally) having regular function-like
+A custom directive, besides (optionally) having regular function-like
 arguments, can also process a full block of markup, like some of the predefined Blade constructs do (like, for instance,
 the `@if (...args) ...markup... @endif` construct does).
 
@@ -100,9 +100,9 @@ the `@if (...args) ...markup... @endif` construct does).
 
     {{ class::method (indentSpace,html,...args) }}
      
-##### Macro implementation
+##### Custom Directive implementation
 
-The method implementing the macro should have the following signature:
+The method implementing the custom directive should have the following signature:
 
 ```php
 static public function macroName ($indentSpace, $html, $arg1, ...) {}
@@ -110,7 +110,7 @@ static public function macroName ($indentSpace, $html, $arg1, ...) {}
 
 * `$arg1, ...` denotes a list of optional arguments. It may be completely ommited.
 * `$indentSpace` is a string comprised of white space, corresponding to the indentation level of the source markup block.
-* `$html` is the markup block defined between the opening and the closing macro tag (`@@tag ... @@endtag`).
+* `$html` is the markup block defined between the opening and the closing custom directive tag (`@@tag ... @@endtag`).
 * The method has no return value. The output it generates should be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
 
@@ -130,12 +130,12 @@ It outputs a valueless attribute if the argument is true, otherwise it suppresse
 
 ##### Generated code
 
-    {{ Macro::boolAttr (precedentSpace,attrName,expression) }}
+    {{ RazorUtil::boolAttr (precedentSpace,attrName,expression) }}
 
 * Parenthesis are optional; ex: `@attr a::b` instead of `@attr a::b()`
-* `Macro` is `Impactwave\Razorblade\Macro`
+* `RazorUtil` is `Impactwave\Razorblade\RazorUtil`
 
-## Predefined Macros
+## Predefined Custom Directives
 
 ### @@field
 
@@ -146,10 +146,10 @@ The generated field has several features that significantly simplify your markup
 The form field will:
 
 * automatically display the current value from the view's model.
-* automatically have an associated label, if one is specified on the macro call.  
+* automatically have an associated label, if one is specified on the custom directive call.  
   The label is bound to the field, so that it is accessibility-enabled and when the uses clicks the label, the field becames focused.
 
-In case of a form validation error upon submission, the macro generates a form field that:
+In case of a form validation error upon submission, the custom directive generates a form field that:
 
 * displays the value that was submitted;
 * replaces mentions to the field name by the corresponding field label;
@@ -160,9 +160,9 @@ In case of a form validation error upon submission, the macro generates a form f
 
 You can also specify which IDs and CSS classes to apply to several elements on the generated markup.
 
-The macro should wrap an arbitrary form field, which you should specify in plain HTML.
+The custom directive should wrap an arbitrary form field, which you should specify in plain HTML.
 
-> **Do not** specify the `name` or `value` attributes on the form field's tag. They will be filled in by the macro based on its arguments.
+> **Do not** specify the `name` or `value` attributes on the form field's tag. They will be filled in by the custom directive based on its arguments.
 
 ##### Blade syntax
 
@@ -177,7 +177,7 @@ The macro should wrap an arbitrary form field, which you should specify in plain
 ##### PHP call syntax
 
 ```php
-Macro::field ('', '<input type="text">', 'name', 'Your name', ['id'=>'idField'])
+RazorUtil::field ('', '<input type="text">', 'name', 'Your name', ['id'=>'idField'])
 ```
 
 * `name`: the field name. For array fields (ex: select multiple), append [] to the field name.
@@ -195,6 +195,7 @@ Macro::field ('', '<input type="text">', 'name', 'Your name', ['id'=>'idField'])
   `lblClass`    | CSS class to apply to the input's label. Default: `'control-label'`.
   `outerId`     | Id to apply to the outer `div`.
   `innerId`     | Id to apply to the inner `div`.
+  `model`       | Field name path prefix, for retrieving values from nested arrays (ex: `'auth.user.name'`). Default: `''`
 
 ---
 
@@ -242,7 +243,7 @@ Inserts a template read from a location inside the `views` directory, directly i
 
 #### Embeds a client-side template
 
-This macro is quite useful for embedding client-side templates on the generated page.
+This custom directive is quite useful for embedding client-side templates on the generated page.
 You can do it like this:
 
 ##### Syntax
@@ -321,14 +322,14 @@ See `@@flashMessage` for more information.
 
 ## The `Form` utility class
 
-The `Impactwave\Razorblade\Form` class provides several static utility methods that are best used in conjunction with the predefined Razorblade macros.
+The `Impactwave\Razorblade\Form` class provides several static utility methods that are best used in conjunction with the predefined Razorblade custom directives.
 
 ### Form::flash
 
 Allows sending flash messages to be viewed on the next request.
 It has support for 4 types of messages and allows setting an optional title.
 
-> **Hint:** use the `@@flashMessage` or `@@toastrMessage` macros for displaying the message.
+> **Hint:** use the `@@flashMessage` or `@@toastrMessage` custom directives for displaying the message.
 
 ##### Syntax
 
@@ -374,7 +375,7 @@ Form::fieldWas ($field, $value)
 
 Sets the data to be initially displayed on a form, before the form is submitted for the first time.
 
-Use this in conjunction with the `@@field` macros and `Form::validate()`.
+Use this in conjunction with the `@@field` custom directives and `Form::validate()`.
 
 ##### Syntax
 
@@ -395,7 +396,7 @@ If validates the form input and, if it fails:
 - saves on the session the validation error messages and the submitted form values, so that they can be
   redisplayed on the next request.
 
-> **Hint:** use this in conjunction with `@@field` macros to easily create a form with validation.
+> **Hint:** use this in conjunction with `@@field` custom directives to easily create a form with validation.
 
 ##### Usage
 

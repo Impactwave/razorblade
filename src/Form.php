@@ -7,6 +7,9 @@ use Redirect;
 use Session;
 use Validator;
 
+/**
+ * Razorblade's form-related utility functions.
+ */
 class Form
 {
   const ALERT_ERROR   = 'error';

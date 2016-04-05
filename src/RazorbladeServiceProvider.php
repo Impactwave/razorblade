@@ -55,7 +55,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           list ($all, $space, $fullName, $class, $method, $args, $nextCh) = $match;
           if ($nextCh == ':') return $all;
           if ($class == '')
-            $class = Macro::class;
+            $class = RazorUtil::class;
           return "$space<?php echo $class::$method($args) ?>$nextCh";
         }, $view);
     });
@@ -86,7 +86,7 @@ class RazorbladeServiceProvider extends ServiceProvider
           if ($close == '@')
             throw new \RuntimeException ("Ill-formed close tag for macro @@$fullName($args)");
           if ($class == '')
-            $class = Macro::class;
+            $class = RazorUtil::class;
           if ($args != '')
             $args = ",$args";
           $content = Blade::compileString ($content);
