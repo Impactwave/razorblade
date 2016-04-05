@@ -9,7 +9,18 @@ use View;
 
 class Macro
 {
-  private static $fieldDefaulOptions = [];
+  private static $fieldDefaulOptions = [
+    'id'           => '',
+    'related'      => '',
+    'relatedLabel' => '',
+    'noLabel'      => false,
+    'outerClass'   => 'form-group',
+    'innerClass'   => 'col-sm-9',
+    'lblClass'     => 'col-sm-2 control-label',
+    'outerId'      => '',
+    'innerId'      => '',
+    'model'        => '',
+  ];
 
   /**
    * @param string $id
@@ -52,22 +63,30 @@ class Macro
    *  - outerId: id a aplicar ao div exterior.
    *  - innerId: id a aplicar ao div interior.
    *  - model: field name path prefix, for retrieving values from nested arrays (ex: 'authe.user.name')
+   *
+   * @param string      $space
+   * @param string      $html
+   * @param string      $name
+   * @param string|null $label   [optional]
+   * @param array       $options [optional]
+   * @return string
    */
   static function field ($space, $html, $name, $label = null, $options = [])
   {
     $options = $options + self::$fieldDefaulOptions;
     // Remove [] suffix, if present.
-    $field    = substr ($name, -1) == ']' ? substr ($name, 0, strlen ($name) - 2) : $name;
-    $model    = array_get ($options, 'model', '');
+    $field = substr ($name, -1) == ']' ? substr ($name, 0, strlen ($name) - 2) : $name;
+    $model = $options ['model'];
     if ($model) $field = "$model.$field";
-    $id       = array_get ($options, 'id', "input-$field");
+    $id       = $options['id'] ?: "input-$field";
     $forId    = $id ? " for=\"$id\"" : '';
     $idAttr   = $id ? " id=\"$id\"" : '';
     $errors   = View::shared ('errors');
-    $outClass = array_get ($options, 'outerClass', 'form-group') . ($errors->has ($field) ? ' has-error' : ' ');
-    $message  = self::validationMessageFor ($field, $label, array_get ($options, 'related'), array_get ($options, 'relatedLabel'));
-    $lblClass = array_get ($options, 'lblClass', 'control-label');
-    $label    = isset($label) && !array_get ($options, 'noLabel') ? "<label$forId class=\"$lblClass\">$label</label>" : '';
+    $outClass = $options['outerClass'] . ($errors->has ($field) ? ' has-error' : ' ');
+    $message  = self::validationMessageFor ($field, $label, $options['related'], $options['relatedLabel']);
+    $lblClass = $options['lblClass'];
+    $label    =
+      isset($label) && !$options['noLabel'] ? "<label$forId class=\"$lblClass\">$label</label>" : '';
     $old      = Input::old ($field);
     $value    = is_array ($old) || is_null ($old) ? '' : $old;
     $html     = Str::contains ($html, '<textarea')
@@ -76,11 +95,11 @@ class Macro
       :
       preg_replace ('/<(input|select)( .*)?>/s', "<$1 name=\"$name\"$idAttr class=\"form-control\"value=\"$value\"$2>",
         $html);
-    $innClass = array_get ($options, 'innerClass', 'controls');
+    $innClass = $options['innerClass'];
     if ($message)
       $message = "$space  $message\n$space";
-    $outId = isset($options['outerId']) ? ' id="' . $options['outerId'] . '"' : '';
-    $innId = isset($options['innerId']) ? ' id="' . $options['innerId'] . '"' : '';
+    $outId = $options['outerId'] ? ' id="' . $options['outerId'] . '"' : '';
+    $innId = $options['innerId'] ? ' id="' . $options['innerId'] . '"' : '';
     return <<<HTML
 $space<div class="$outClass"$outId>
 $space  $label
