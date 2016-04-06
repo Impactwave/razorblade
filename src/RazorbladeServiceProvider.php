@@ -50,7 +50,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      * If class is not specified, Form is assumed.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(\s*\((?:(?!\)[\s:]).)*\))?(.)/ms',
+      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(?:\s*\(((?:(?!\)[\s:]).)*?)\))?(.)/ms',
         function ($match) {
           list ($all, $space, $fullName, $class, $method, $args, $nextCh) = $match;
           if ($nextCh == ':') return $all;
