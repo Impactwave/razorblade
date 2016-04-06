@@ -255,4 +255,9 @@ HTML;
     return $message;
   }
 
+  static function php ($space, $html)
+  {
+    return "<?php\n" . $html . "\n?>";
+  }
+
 }
