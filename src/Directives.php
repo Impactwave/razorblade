@@ -10,7 +10,7 @@ use View;
 /**
  * Razorblade's set of predefined custom directives.
  */
-class RazorUtil
+class Directives
 {
   private static $fieldDefaulOptions = [
     'id'           => '',
@@ -125,7 +125,7 @@ HTML;
     if (Session::has ('message')) {
       list ($flashType, $message, $title) = explode ('|', Session::get ('message')) + [''] + [''];
       $title = $title ? "<h4>$title</h4>" : '';
-      echo <<<HTML
+      return <<<HTML
 <div class="alert alert-$flashType">
   $title$message
 </div>
@@ -140,11 +140,12 @@ HTML;
    * <p>It outputs `form-group`, with an additional `has-error` CSS class if the field failed validation.
    *
    * @param string $field Field name.
+   * @return string
    */
   static function groupClass ($field)
   {
     $errors = View::shared ('errors');
-    echo 'form-group' . ($errors->has ($field) ? ' has-error' : ' ');
+    return 'form-group' . ($errors->has ($field) ? ' has-error' : ' ');
   }
 
   /**
@@ -169,6 +170,19 @@ HTML;
   static function includeStatic ($path)
   {
     include app_path () . "/views/$path";
+  }
+
+  /**
+   * Includes a block of PHP code inside a blade template, without using the `<?php ?>` tags, therefore not breaking the
+   * compilation of custom directives on that template.
+   *
+   * @param string $space
+   * @param string $html
+   * @return string
+   */
+  static function php_compiler ($space, $html)
+  {
+    return "<?php\n$space$html?>";
   }
 
   /**
@@ -203,9 +217,9 @@ HTML;
   /**
    * Outputs a hidden form field with a CSRF token for use by Laravel's CSRF middleware.
    */
-  static function token ()
+  static function token_compiler ()
   {
-    echo '<input type="hidden" name="_token" value="' . csrf_token () . '">';
+    return '<input type="hidden" name="_token" value="<?=csrf_token()?>">';
   }
 
   /**
@@ -253,11 +267,6 @@ HTML;
       $message  = preg_replace ("/\\b$fieldEsc\\b/", $relatedLabel, $message);
     }
     return $message;
-  }
-
-  static function php ($space, $html)
-  {
-    return "<?php\n" . $html . "\n?>";
   }
 
 }

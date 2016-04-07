@@ -43,7 +43,7 @@ You just create a simple static method on a class of your choosing, with a speci
 and you can immediately call it from Blade.  
 Implementing the method itself to perform some useful work is also quite simple.
 
-> Razorblade provides you with some predefined custom directives on the `Impactwave\Razorblade\Macros` class.
+> Razorblade provides you with some predefined custom directives on the `Impactwave\Razorblade\Directives` class.
 > See the documentation for them further below.
 
 ### Simple Custom Directives
@@ -57,25 +57,35 @@ The method can, optionally, receive one or more arguments from the template.
     
 > **Note:** `[]` brackets are not part of the syntax, they denote optional elements.
   
-##### Generated code
+##### Generated pseudo-code
 
     {{ class::method (args) }}
 
 * Parenthesis are optional; ex: `@@a::b` instead of `@@a::b()`.  
 * `class` is a fully qualified class name; ex: `my\namespace\myClass` or just `myClass`.  
-* If class is not specified, `Impactwave\Razorblade\Macros` is assumed.
+* If `class` is not specified, `Impactwave\Razorblade\Directives` is assumed.
 
 ##### Custom Directive implementation
 
 The method implementing the custom directive should have the following signature:
 
 ```php
-static public function macroName ($arg1, ...) {}
+static public function directiveName ($arg1, ...) {}
 ```
 
 * `$arg1, ...` denotes a list of optional arguments. It may be completely ommited.
-* The method has no return value. The output it generates should be sent to the normal PHP output buffer,
+* The method should return a string. Alternatively, the output it generates may instead be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
+
+##### Compile-time code generation
+
+If a `{$method}_compiler` method exists, Razorblade will invoke it at compile-time to generate the compiled code for inclusion on the template, instead of generating code to call `$method` at runtime. This allows you to have complete control over the generated code.
+
+The compiler method signature must be:
+
+```php
+static public function directiveName_compiler ($arg1, ...) {}
+```
 
 ### Block Custom Directives
 
@@ -94,9 +104,9 @@ the `@if (...args) ...markup... @endif` construct does).
 * `args` it's a list of arguments and it's optional.  
 * Parenthesis are optional; ex: `@@a::b` instead of `@@a::b()`.  
 * `class` is a fully qualified class name; ex: `my\namespace\myClass` or just `myClass`.  
-* If `class` is not specified, `Impactwave\Razorblade\Macros` is assumed.
+* If `class` is not specified, `Impactwave\Razorblade\Directives` is assumed.
 
-##### Generated code
+##### Generated pseudo-code
 
     {{ class::method (indentSpace,html,...args) }}
      
@@ -105,14 +115,24 @@ the `@if (...args) ...markup... @endif` construct does).
 The method implementing the custom directive should have the following signature:
 
 ```php
-static public function macroName ($indentSpace, $html, $arg1, ...) {}
+static public function directiveName ($indentSpace, $html, $arg1, ...) {}
 ```
 
 * `$arg1, ...` denotes a list of optional arguments. It may be completely ommited.
 * `$indentSpace` is a string comprised of white space, corresponding to the indentation level of the source markup block.
 * `$html` is the markup block defined between the opening and the closing custom directive tag (`@@tag ... @@endtag`).
-* The method has no return value. The output it generates should be sent to the normal PHP output buffer,
+* The method should return a string. Alternatively, the output it generates may instead be sent to the normal PHP output buffer,
   either using `echo` or a markup block (`?> ...markup... <?php`).
+
+##### Compile-time code generation
+
+If a `{$method}_compiler` method exists, Razorblade will invoke it at compile-time to generate the compiled code for inclusion on the template, instead of generating code to call `$method` at runtime. This allows you to have complete control over the generated code.
+
+The compiler method signature must be:
+
+```php
+static public function directiveName_compiler ($indentSpace, $html, $arg1, ...) {}
+```
 
 ### Boolean attribute generation
 
@@ -126,14 +146,13 @@ It outputs a valueless attribute if the argument is true, otherwise it suppresse
 
 ##### Output
 
-> **Ex:** `<option selected>` se `true`, ou `<option>` se `false`.
+> **Ex:** `<option selected>` if `true`, or `<option>` if `false`.
 
-##### Generated code
+##### Generated pseudo-code
 
-    {{ RazorUtil::boolAttr (precedentSpace,attrName,expression) }}
+    <?php echo $expression ? '$precedentSpace$attrName' : '' ?>
 
 * Parenthesis are optional; ex: `@attr a::b` instead of `@attr a::b()`
-* `RazorUtil` is `Impactwave\Razorblade\RazorUtil`
 
 ## Predefined Custom Directives
 
@@ -177,7 +196,7 @@ The custom directive should wrap an arbitrary form field, which you should speci
 ##### PHP call syntax
 
 ```php
-RazorUtil::field ('', '<input type="text">', 'name', 'Your name', ['id'=>'idField'])
+Directives::field ('', '<input type="text">', 'name', 'Your name', ['id'=>'idField'])
 ```
 
 * `name`: the field name. For array fields (ex: select multiple), append [] to the field name.
@@ -254,7 +273,7 @@ You can do it like this:
 * `path `: the template's file path, relative to the `views` directory.
 * `type` [optional]: the type attribute for the generated `script` tag. Defaults to `'text/template'`.
 
-##### Generated code
+##### Generated pseudo-code
 
 ```html
 <script id="myTemplate" type="text/template">
