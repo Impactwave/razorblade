@@ -260,7 +260,8 @@ HTML;
     $errors  = View::shared ('errors');
     $message = $errors->first ($field, '<span class="help-block">:message</span>');
     if (!$message) return '';
-    $fieldEsc = preg_quote ($field);
+    $fieldEsc = str_replace ('_', ' ',
+      preg_quote ($field)); // Fix Laravel bug that replaces underscores by spaces on the field name on the message.
     $message  = $label ? preg_replace ("/\\b$fieldEsc\\b/", $label, $message) : $message;
     if (isset($related)) {
       $fieldEsc = preg_quote ($related);
