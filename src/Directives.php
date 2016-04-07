@@ -114,7 +114,7 @@ HTML;
 
   static function fieldDefaultOptions ($options = [])
   {
-    self::$fieldDefaulOptions = $options;
+    self::$fieldDefaulOptions = array_merge (self::$fieldDefaulOptions, $options);
   }
 
   /**
