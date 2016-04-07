@@ -173,8 +173,8 @@ HTML;
   }
 
   /**
-   * Includes a block of PHP code inside a blade template, without using the `<?php ?>` tags, therefore not breaking the
-   * compilation of custom directives on that template.
+   * Allows the inclusion of a block of PHP code inside a blade template without using `<?php ?>` tags.
+   * It is required if you want to embed PHP code on Blade templates that use Razorblade custom directives.
    *
    * @param string $space
    * @param string $html

@@ -339,6 +339,26 @@ Displays a popup flash message using the Toastr javascript plugin.
 
 See `@@flashMessage` for more information.
 
+---
+
+### @@php
+
+#### Embeds PHP code inline
+
+Allows the inclusion of a block of PHP code inside a blade template without using `<?php ?>` tags.
+
+It is required if you want to embed PHP code on Blade templates that use Razorblade block custom directives.
+
+> **Warning:** if you use `<?php ?>` tags on Blade templates, block custom directives **will not be compiled**, as inlined
+PHP blocks split template compilation into separate fragments, which will interfere with the compilation logic.
+
+##### Syntax
+
+    @@php:
+      $v = "my PHP code";
+      // etc...
+    @@endphp
+
 ## The `Form` utility class
 
 The `Impactwave\Razorblade\Form` class provides several static utility methods that are best used in conjunction with the predefined Razorblade custom directives.
