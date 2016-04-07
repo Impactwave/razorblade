@@ -54,7 +54,7 @@ class RazorbladeServiceProvider extends ServiceProvider
      * This allows you to have complete control over the generated code.
      */
     Blade::extend (function ($view) {
-      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(?:\s*\(((?:(?!\)[\s:]).)*?)\))?(.)/ms',
+      return preg_replace_callback ('/(?<!\w)(\s*)@@((?!end)(?:([\w\\\\]+)::)?(\w+))(?!\w)(?:\s*\(((?:(?!\)[\s:]).)*)\))?(.)/ms',
         function ($match) {
           list ($all, $space, $fullName, $class, $method, $args, $nextCh) = $match;
           if ($nextCh == ':') return $all;
