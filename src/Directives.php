@@ -76,7 +76,7 @@ class Directives
    */
   static function field ($space, $html, $name, $label = null, $options = [])
   {
-    $options = $options + self::$fieldDefaulOptions;
+    $options = array_merge (self::$fieldDefaulOptions, $options);
     // Remove [] suffix, if present.
     $field = substr ($name, -1) == ']' ? substr ($name, 0, strlen ($name) - 2) : $name;
     $model = $options ['model'];
