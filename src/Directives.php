@@ -94,7 +94,7 @@ class Directives
     $value    = is_array ($old) || is_null ($old) ? '' : $old;
     $html     = Str::contains ($html, '<textarea')
       ?
-      preg_replace ('/<(textarea)( .*)?>/s', "<$1 name=\"$name\"$idAttr class=\"form-control\"$2>$value</$1>", $html)
+      preg_replace ('/<(textarea)( .*)?>.*?</textarea>/s', "<$1 name=\"$name\"$idAttr class=\"form-control\"$2>$value</$1>", $html)
       :
       preg_replace ('/<(input|select)( .*)?>/s', "<$1 name=\"$name\"$idAttr class=\"form-control\"value=\"$value\"$2>",
         $html);
