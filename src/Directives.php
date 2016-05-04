@@ -92,7 +92,8 @@ class Directives
       isset($label) && !$options['noLabel'] ? "<label$forId class=\"$lblClass\">$label</label>" : '';
     $old      = Input::old ($field);
     $value    = is_array ($old) || is_null ($old) ? '' : $old;
-    $html     = Str::contains ($html, '<textarea')
+    $value    = str_replace("\\","\\\\",$value);//since value is being used in the replace pattern, we need to escape the slashes
+	$html     = Str::contains ($html, '<textarea')
       ?
       preg_replace ('/<(textarea)( .*)?>.*?<\/textarea>/s', "<$1 name=\"$name\"$idAttr class=\"form-control\"$2>$value</$1>", $html)
       :
